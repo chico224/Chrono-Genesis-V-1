@@ -1,7 +1,7 @@
 """
 ARCHITECTURAL BLUEPRINT: CHRONO-GENESIS ECOSYSTEM
 CONCEPT: Autonomous Digital Civilization
-ENGINEER: Oumar Sow & Lead AI Architect (70y Exp Spirit)
+ENGINEER: Oumar Sow
 
 NOTES: 
 - Resilience is the priority. 
