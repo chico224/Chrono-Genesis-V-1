@@ -3,3 +3,4 @@ composio-crewai==0.2.0
 langchain-openai==0.1.3
 python-dotenv==1.0.1
 pydantic==2.6.4
+web3==6.19.0
