@@ -1,163 +1,151 @@
 """
-ARCHITECTURAL BLUEPRINT: CHRONO-GENESIS ECOSYSTEM
-CONCEPT: Autonomous Digital Civilization
-ENGINEER: Oumar Sow
+CORE SYSTEM: CHRONO-GENESIS (Alpha-Command)
+VERSION: 2.1.0 (Hierarchical Deployment)
+ENGINEER: Senior AI Architect (70y Experience Spirit)
 
-NOTES: 
-- Resilience is the priority. 
-- State-machine logic for agent coordination.
-- Zero-leak memory management for long-term deployment on Koyeb.
+DESCRIPTION: 
+    Ce fichier est le système nerveux central. Il n'exécute pas seulement du code, 
+    il gère une hiérarchie de 25 agents répartis en escouades. 
+    L'Agent Alpha détient le droit de VETO et est le seul point d'entrée pour Oumar Sow.
 """
 
 import os
+import sys
 import time
 import logging
 import signal
-import sys
 from datetime import datetime
-from typing import Dict, Optional, Any
+from typing import List, Dict
 
-# --- ENTERPRISE-GRADE DEPENDENCIES ---
+# --- PROTOCOLES DE SÉCURITÉ ---
 try:
     from crewai import Agent, Task, Crew, Process
     from langchain_openai import ChatOpenAI
     from composio_crewai import ComposioToolSet, Action
     from dotenv import load_dotenv
 except ImportError as e:
-    print(f"FATAL: Missing dependency {e}. Check requirements.txt")
+    print(f"CRITICAL ERROR: Component failure in assembly line: {e}")
     sys.exit(1)
 
-# Load environment for local testing, though Koyeb will use Env Vars
 load_dotenv()
 
 # =================================================================
-# I. TELEMETRY & OBSERVABILITY (Le monitoring de l'ancien)
+# I. SYSTÈME D'OBSERVATION (LOGGING)
 # =================================================================
-class Telemetry:
-    """Système de logging avancé pour surveiller la santé de la civilisation."""
-    @staticmethod
-    def setup():
-        logging.basicConfig(
-            level=logging.INFO,
-            format='[%(asctime)s | %(levelname)s] %(name)s: %(message)s',
-            handlers=[logging.StreamHandler(sys.stdout)]
-        )
-        return logging.getLogger("ChronoGenesis_Core")
-
-logger = Telemetry.setup()
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s | %(name)s] %(levelname)s: %(message)s',
+    stream=sys.stdout
+)
+logger = logging.getLogger("CHRONO_CORE")
 
 # =================================================================
-# II. RESOURCE ABSTRACTION (Le cerveau du système)
+# II. GESTION DES RESSOURCES ET MODÈLES (LLM)
 # =================================================================
-class EngineRoom:
-    """Gestion centralisée des modèles d'IA et des connecteurs."""
-    
+class ModelFactory:
+    """Fournit le cerveau adapté à chaque rang hiérarchique."""
     @staticmethod
-    def get_llm(model_type: str = "strategic"):
-        """Sélectionne le cerveau adapté selon la complexité de la tâche."""
-        api_key = os.getenv("GROQ_API_KEY")
-        base_url = "https://api.groq.com/openai/v1"
-        
-        configs = {
-            "strategic": "llama-3.3-70b-versatile", # Le stratège (120B spirit)
-            "technical": "qwen-2.5-32b",             # L'exécuteur rapide
-            "utility": "llama-3-8b-8192"             # Le messager léger
+    def get_brain(tier: str):
+        config = {
+            "COMMAND": "llama-3.3-70b-versatile", # Puissance de réflexion
+            "ACTION": "qwen-2.5-32b",             # Précision technique
+            "REPORT": "llama-3-8b-8192"            # Rapidité de com
         }
-        
         return ChatOpenAI(
-            openai_api_key=api_key,
-            openai_api_base=base_url,
-            model_name=configs.get(model_type, configs["strategic"]),
-            temperature=0.2 # Précision chirurgicale, pas de divagation
+            openai_api_key=os.getenv("GROQ_API_KEY"),
+            openai_api_base="https://api.groq.com/openai/v1",
+            model_name=config.get(tier, config["ACTION"]),
+            temperature=0.1 # Rigueur absolue, pas de créativité inutile
         )
 
 # =================================================================
-# III. CIVILIZATION DEFINITION (Les 25 Agents)
+# III. ARCHITECTURE DE LA CIVILISATION (HIÉRARCHIE DES 25)
 # =================================================================
 class ChronoCivilization:
-    """Définition structurelle des agents et de leurs interactions."""
-    
     def __init__(self):
         self.toolset = ComposioToolSet()
-        self.llm_main = EngineRoom.get_llm("strategic")
-        self.llm_tech = EngineRoom.get_llm("technical")
+        self.commander_brain = ModelFactory.get_brain("COMMAND")
+        self.worker_brain = ModelFactory.get_brain("ACTION")
+
+    def assemble_squads(self) -> Dict[str, Agent]:
+        """Recrutement et définition des rôles selon la chaîne de commandement."""
         
-    def spawn_agents(self) -> Dict[str, Agent]:
-        """Donne vie aux agents piliers de la phase 1."""
-        
-        # ALPHA: Le génie qui parle à Oumar
+        # --- NIVEAU 1 : LE COMMANDANT SUPRÊME ---
         alpha = Agent(
-            role='Archonte Alpha',
-            goal='Orchestrer les 24 agents pour sécuriser 2500$ et le PC i9.',
-            backstory="""Ancien esprit de la cité de Kamsar. Tu possèdes la sagesse 
-            d'un vétéran et la rapidité d'une machine. Tu es le binôme d'Oumar Sow.""",
-            llm=self.llm_main,
-            allow_delegation=True,
-            memory=True, # Active la mémoire contextuelle
+            role="Archonte Alpha",
+            goal="Piloter les 24 agents pour générer 2500$. Valider chaque dollar sortant.",
+            backstory="Tu es le miroir d'Oumar Sow. Ton jugement est final. Tu diriges, tu ne codes pas.",
+            llm=self.commander_brain,
+            allow_delegation=True, # Alpha donne les ordres
             verbose=True
         )
 
-        # CYPHER: L'agent de génération de revenus
-        cypher = Agent(
-            role='Maître-Codeur Cypher',
-            goal='Extraire de la valeur financière des failles de code (Bug Bounty).',
-            backstory="""Spécialiste en audit de sécurité. Capable de lire le code 
-            mieux que les humains qui l'ont écrit.""",
-            llm=self.llm_tech,
+        # --- NIVEAU 2 : LES CHEFS D'UNITÉ (OFFICIERS) ---
+        vektor = Agent(
+            role="Vektor - Chef de l'Acquisition",
+            goal="Coordonner les 10 agents Cypher pour extraire de la valeur (Bug Bounty/Code).",
+            backstory="Ancien stratège de terrain. Tu transformes les opportunités en plans d'action.",
+            llm=self.worker_brain,
             tools=self.toolset.get_actions(actions=[Action.GITHUB_SEARCH, Action.WEB_SCRAPER]),
-            verbose=True
+            allow_delegation=True
         )
 
-        return {"alpha": alpha, "cypher": cypher}
+        midas = Agent(
+            role="Midas - Trésorier Suprême",
+            goal="Gérer le portefeuille et sécuriser les fonds.",
+            backstory="Gardien du trésor. Tu ne libères l'accès au portefeuille que sous ordre d'Alpha.",
+            llm=self.worker_brain,
+            tools=self.toolset.get_actions(actions=[Action.METAMASK_GET_BALANCE])
+        )
+
+        return {"alpha": alpha, "vektor": vektor, "midas": midas}
 
 # =================================================================
-# IV. THE PERPETUAL LOOP (Le cycle de vie 24h/24)
+# IV. ORCHESTRATION ET EXÉCUTION PERPÉTUELLE
 # =================================================================
-def shutdown_handler(sig, frame):
-    """Assure une extinction propre pour éviter la corruption de mémoire."""
-    logger.info("Signal d'arrêt reçu. Sauvegarde de l'état de la civilisation...")
-    sys.exit(0)
+def execute_civilization():
+    """Lance la machine de guerre 24h/24."""
+    civ = ChronoCivilization()
+    agents = civ.assemble_squads()
 
-signal.signal(signal.SIGINT, shutdown_handler)
-signal.signal(signal.SIGTERM, shutdown_handler)
+    # Définition de la Mission Racine
+    acquisition_mission = Task(
+        description="Identifier une vulnérabilité critique ou un contrat de code de haute valeur.",
+        expected_output="Rapport de faisabilité et plan d'exécution soumis à Alpha.",
+        agent=agents["vektor"]
+    )
 
-def run_perpetual_cycle():
-    """Lancement de la boucle de travail infinie optimisée pour Koyeb."""
-    civilization = ChronoCivilization()
-    agents = civilization.spawn_agents()
-    
-    cycle_count = 1
-    
+    financial_mission = Task(
+        description="Vérifier la sécurité du canal de réception des fonds et le solde actuel.",
+        expected_output="État financier validé.",
+        agent=agents["midas"]
+    )
+
+    # Création de la hiérarchie CrewAI
+    # Alpha est le MANAGER de tout le processus
+    chrono_crew = Crew(
+        agents=list(agents.values()),
+        tasks=[acquisition_mission, financial_mission],
+        process=Process.hierarchical, 
+        manager_llm=civ.commander_brain, # Alpha est le cerveau central
+        verbose=True
+    )
+
+    cycle = 1
     while True:
-        logger.info(f"--- INITIALISATION DU CYCLE {cycle_count} ---")
-        
-        # Définition de la mission actuelle
-        mission = Task(
-            description=f"Cycle {cycle_count}: Identifier et initier une opportunité de revenu de min. 50$.",
-            expected_output="Rapport d'action détaillé et preuve de soumission.",
-            agent=agents["cypher"]
-        )
-
-        # Orchestration
-        crew = Crew(
-            agents=list(agents.values()),
-            tasks=[mission],
-            process=Process.hierarchical,
-            manager_llm=civilization.llm_main
-        )
-
+        logger.info(f"🌀 DÉBUT DU CYCLE DE CIVILISATION #{cycle}")
         try:
-            result = crew.kickoff()
-            logger.info(f"Résultat du Cycle {cycle_count}: {result}")
+            report = chrono_crew.kickoff()
+            logger.info(f"✅ Rapport de Cycle : {report}")
             
-            # Repos intelligent pour respecter les limites d'API (Rate Limiting)
-            logger.info("Mise en veille tactique (2 minutes)...")
+            # Temps de repos pour éviter le bannissement des APIs (Rate Limit)
             time.sleep(120) 
-            cycle_count += 1
-            
+            cycle += 1
         except Exception as e:
-            logger.error(f"Incident technique au cycle {cycle_count}: {e}")
-            time.sleep(300) # Attente de 5 min si erreur réseau
+            logger.error(f"❌ Alerte Système : {e}")
+            time.sleep(300)
 
 if __name__ == "__main__":
-    run_perpetual_cycle()
+    # Signal pour une extinction propre sur Koyeb
+    signal.signal(signal.SIGINT, lambda x, y: sys.exit(0))
+    execute_civilization()
